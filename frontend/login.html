@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login | Health Access Bridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="login-page">
+
+  <header>
+    <h1 data-text="login">Health Access Bridge Login</h1>
+  </header>
+
+  <section class="form-section">
+    
+    <!-- Login Form -->
+    <input type="text" id="username" placeholder="Username" data-text="username">
+    <input type="password" id="password" placeholder="Password" data-text="password">
+
+    <!-- Role Selector -->
+    <select id="role">
+      <option value="user" data-text="user">User</option>
+      <option value="admin" data-text="admin">Admin</option>
+    </select>
+
+    <!-- Login Button -->
+    <button id="loginBtn" data-text="login">Login</button>
+
+    <!-- Link to Register -->
+    <p>Don't have an account? <a href="register.html" data-text="register">Register</a></p>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

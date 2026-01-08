@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Health Access Bridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="admin-page">
+
+  <header>
+    <h1 data-text="addScheme">Health Access Bridge</h1>
+    <button id="logoutBtn" data-text="logout">Logout</button>
+  </header>
+
+  <section class="form-section">
+    <h2 data-text="addScheme">Add New Scheme</h2>
+    
+
+    <input type="text" id="name" placeholder="Scheme Name" data-text="name">
+    <textarea id="description" placeholder="Description" data-text="description"></textarea>
+    <input type="text" id="category" placeholder="Category" data-text="category">
+    <input type="text" id="age_group" placeholder="Age Group" data-text="age_group">
+    <input type="text" id="gender" placeholder="Gender" data-text="gender">
+    <input type="text" id="income_group" placeholder="Income Group" data-text="income_group">
+    <input type="text" id="apply_link" placeholder="Apply Link URL" data-text="apply_link">
+    <button id="addSchemeBtn" data-text="addScheme">Add Scheme</button>
+  </section>
+
+  <section class="schemes-section">
+    <h2>All Schemes</h2>
+    <div id="schemeList" class="scheme-cards"></div>
+  </section>
+
+  <script src="script.js"></script>
+  <script>
+    // Fetch and display all schemes for admin
+    async function loadSchemes() {
+      const res = await fetch('http://localhost:5002/schemes');
+      const schemes = await res.json();
+      const container = document.getElementById('schemeList');
+      container.innerHTML = '';
+      schemes.forEach(scheme => {
+        const card = document.createElement('div');
+        card.className = 'scheme-card';
+        card.innerHTML = `
+          <h3>${scheme.name}</h3>
+          <p>${scheme.description}</p>
+          <p><strong>Category:</strong> ${scheme.category}</p>
+          <p><strong>Age:</strong> ${scheme.age_group}, <strong>Gender:</strong> ${scheme.gender}</p>
+          <p><strong>Income:</strong> ${scheme.income_group || 'All'}</p>
+          <p><strong>Apply Link:</strong> <a href="${scheme.apply_link}" target="_blank">Go</a></p>
+          <button class="delete-btn" onclick="deleteScheme(${scheme.id})">Delete</button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Delete scheme
+    async function deleteScheme(id) {
+      if(!confirm('Are you sure to delete this scheme?')) return;
+      await fetch(`http://localhost:5002/admin/schemes/${id}`, { method: 'DELETE' });
+      loadSchemes();
+    }
+
+    document.getElementById('addSchemeBtn')?.addEventListener('click', async () => {
+      const name = document.getElementById('name').value;
+      const description = document.getElementById('description').value;
+      const category = document.getElementById('category').value;
+      const age_group = document.getElementById('age_group').value;
+      const gender = document.getElementById('gender').value;
+      const income_group = document.getElementById('income_group').value;
+      const apply_link = document.getElementById('apply_link').value;
+
+      await fetch('http://localhost:5002/admin/schemes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({name, description, category, age_group, gender, income_group, apply_link})
+      });
+      loadSchemes();
+    });
+
+    window.onload = loadSchemes;
+  </script>
+</body>
+</html>

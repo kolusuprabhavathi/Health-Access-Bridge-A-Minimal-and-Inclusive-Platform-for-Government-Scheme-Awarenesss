@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard | Health Access Bridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="user-page">
+
+  <header>
+    <h1>Health Access Bridge</h1>
+    <button id="logoutBtn">Logout</button>
+  </header>
+
+  <section class="filters">
+    <!-- Search Schemes -->
+    <input type="text" id="searchInput" placeholder="Search schemes...">
+
+    <!-- Category Selector -->
+    <select id="categoryFilter">
+      <option value="">All Categories</option>
+      <option value="Pregnant Women">Pregnant Women</option>
+      <option value="Children">Children</option>
+      <option value="Women">Women</option>
+      <option value="Men">Men</option>
+      <option value="Senior Citizens">Senior Citizens</option>
+      <option value="Low Income">Low Income</option>
+      <option value="All Citizens">All Citizens</option>
+    </select>
+
+    <!-- Gender Selector -->
+    <select id="genderFilter">
+      <option value="">All Genders</option>
+      <option value="Female">Female</option>
+      <option value="Male">Male</option>
+      <option value="All">All</option>
+    </select>
+  </section>
+
+  <main id="schemes" class="scheme-cards"></main>
+
+  <script src="script.js"></script>
+  <script>
+    async function loadSchemes() {
+      const res = await fetch('http://localhost:5002/schemes');
+      const schemes = await res.json();
+      displaySchemes(schemes);
+    }
+
+    function displaySchemes(schemes) {
+      const container = document.getElementById('schemes');
+      const searchText = document.getElementById('searchInput').value.toLowerCase();
+      const categoryValue = document.getElementById('categoryFilter').value;
+      const genderValue = document.getElementById('genderFilter').value;
+
+      container.innerHTML = '';
+
+      schemes
+        .filter(scheme => {
+          const matchesSearch = scheme.name.toLowerCase().includes(searchText) ||
+                                scheme.description.toLowerCase().includes(searchText);
+
+          const matchesCategory = categoryValue === "" || scheme.category === categoryValue;
+          const matchesGender = genderValue === "" || scheme.gender === genderValue || scheme.gender === "All";
+
+          return matchesSearch && matchesCategory && matchesGender;
+        })
+        .forEach(scheme => {
+          const card = document.createElement('div');
+          card.className = 'scheme-card';
+          card.innerHTML = `
+            <h3>${scheme.name}</h3>
+            <p>${scheme.description}</p>
+            <p><strong>Category:</strong> ${scheme.category}</p>
+            <p><strong>Age:</strong> ${scheme.age_group}, <strong>Gender:</strong> ${scheme.gender}</p>
+            <p><strong>Income:</strong> ${scheme.income_group || 'All'}</p>
+            <a href="${scheme.apply_link}" target="_blank" class="apply-btn">Apply Now</a>
+          `;
+          container.appendChild(card);
+        });
+    }
+
+    // Event listeners for filters
+    document.getElementById('searchInput').addEventListener('input', loadSchemes);
+    document.getElementById('categoryFilter').addEventListener('change', loadSchemes);
+    document.getElementById('genderFilter').addEventListener('change', loadSchemes);
+
+    // Load schemes on page load
+    window.onload = loadSchemes;
+
+    // Logout button
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      sessionStorage.clear();
+      window.location.href = 'login.html';
+    });
+  </script>
+</body>
+</html>
